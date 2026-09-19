@@ -1,0 +1,17 @@
+{
+  "name": "QARZ ManaGER",
+  "short_name": "QARZ ManaGER",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#eef5ff",
+  "theme_color": "#1d4ed8",
+  "description": "Mobil qarz va to'lovlar boshqaruvi",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

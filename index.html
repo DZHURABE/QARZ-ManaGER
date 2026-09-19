@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="tg">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1d4ed8" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="description" content="QARZ ManaGER — qarzlar va to'lovlarni boshqarish uchun mobil ilova" />
+    <title>QARZ ManaGER | Mobil ilova</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="icon.svg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-icon">QM</div>
+          <div>
+            <p class="brand-name" data-i18n="brandName">QARZ ManaGER</p>
+            <span class="brand-sub" data-i18n="brandSub">Shaxsiy kabin</span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="icon-button search-btn" data-i18n="search" aria-label="Qidiruv" id="searchToggleBtn">
+            <span>⌕</span>
+          </button>
+          <button class="icon-button notify-btn" data-i18n="notify" aria-label="Bildirishnoma">
+            <span>🔔</span>
+            <span class="badge">3</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="search-panel hidden" id="searchPanel">
+        <input type="text" id="searchInput" placeholder="Qarzdorni qidiring..." />
+      </div>
+
+      <main class="app-main">
+        <section class="screen active" data-screen="home">
+          <div class="summary">
+            <div class="summary-card primary">
+              <span data-i18n="totalDebt">Umumiy qarz</span>
+              <strong>1 245 000 so'm</strong>
+              <small data-i18n="totalDebtTrend">+12% oy bo'yicha</small>
+            </div>
+
+            <div class="summary-card">
+              <span data-i18n="paid">To'langan</span>
+              <strong>540 000 so'm</strong>
+              <small data-i18n="thisMonth">Bu oy</small>
+            </div>
+
+            <div class="summary-card">
+              <span data-i18n="debtors">Qarzdorlar</span>
+              <strong id="debtors-count">48</strong>
+              <small data-i18n="newDebt">12 ta yangi</small>
+            </div>
+
+            <div class="summary-card">
+              <span data-i18n="activeClients">Faol mijozlar</span>
+              <strong>29</strong>
+              <small data-i18n="goodRate">Ko'rsatkich yaxshi</small>
+            </div>
+
+            <div class="wallet-card">
+              <div>
+                <span data-i18n="walletBalance">Ҳамёндаги пул</span>
+                <strong id="walletBalance">540 000 сомон</strong>
+                <small data-i18n="walletAvailable">Картага чиқариш учун мавжуд</small>
+              </div>
+              <button class="wallet-withdraw-btn" id="openWithdraw" type="button" data-i18n="withdraw">Картага чиқариш</button>
+            </div>
+          </div>
+
+          <div class="withdraw-modal hidden" id="withdrawModal" role="dialog" aria-modal="true" aria-labelledby="withdrawTitle">
+            <div class="withdraw-dialog">
+              <button class="modal-close" id="closeWithdraw" type="button" aria-label="Закрыть">×</button>
+              <p class="label" data-i18n="withdrawStep">Пулни чиқариш</p>
+              <h2 id="withdrawTitle" data-i18n="withdrawTitle">Пулни картага ўтказиш</h2>
+              <p class="payment-note" data-i18n="withdrawNote">Карта рақами ва чиқариладиган суммани киритинг.</p>
+
+              <form id="withdrawForm">
+                <div class="field-group">
+                  <label for="withdrawCard" data-i18n="withdrawCard">Қабул қилувчи карта рақами</label>
+                  <input id="withdrawCard" inputmode="numeric" placeholder="0000 0000 0000 0000" required />
+                </div>
+                <div class="field-group">
+                  <label for="withdrawAmount" data-i18n="withdrawAmount">Сумма</label>
+                  <input id="withdrawAmount" type="number" min="1" placeholder="100" required />
+                </div>
+                <button class="submit-btn payment-submit" type="submit" data-i18n="withdrawConfirm">Чиқаришни тасдиқлаш</button>
+              </form>
+              <p class="payment-status" id="withdrawStatus" role="status"></p>
+            </div>
+          </div>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="label" data-i18n="allData">Barcha ma'lumotlar</p>
+                <h2 data-i18n="debtListTitle">Qarzdorlar ro'yxati</h2>
+              </div>
+              <button class="add-btn" data-go="add" data-i18n="addDebtorBtn">+ Qarzdor qo'shish</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="fullName">F.I.Sh</th>
+                    <th data-i18n="phone">Telefon</th>
+                    <th data-i18n="debtAmount">Qarz miqdori</th>
+                    <th data-i18n="status">Status</th>
+                    <th data-i18n="lastPayment">Oxirgi to'lov</th>
+                    <th data-i18n="action">Harakat</th>
+                  </tr>
+                </thead>
+                <tbody id="debtor-table-body">
+                  <tr>
+                    <td>Abdulla Karimov</td>
+                    <td>+998 90 123 45 67</td>
+                    <td>320 000 so'm</td>
+                    <td><span class="status active">Faol</span></td>
+                    <td>12.09.2026</td>
+                    <td><button class="mini-btn">Ko'rish</button></td>
+                  </tr>
+
+                  <tr>
+                    <td>Malika Saidova</td>
+                    <td>+998 93 765 43 21</td>
+                    <td>185 000 so'm</td>
+                    <td><span class="status warning">Kutilmoqda</span></td>
+                    <td>09.09.2026</td>
+                    <td><button class="mini-btn">Ko'rish</button></td>
+                  </tr>
+
+                  <tr>
+                    <td>Jasur Toshmatov</td>
+                    <td>+998 99 111 22 33</td>
+                    <td>410 000 so'm</td>
+                    <td><span class="status critical">Muddat o'tgan</span></td>
+                    <td>05.09.2026</td>
+                    <td><button class="mini-btn">Ko'rish</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="screen" data-screen="add">
+          <div class="form-card">
+            <div class="panel-header compact-header">
+              <div>
+                <p class="label" data-i18n="newClient">Yangi mijoz</p>
+                <h2 data-i18n="addDebtorTitle">Qarzdor qo'shish</h2>
+              </div>
+            </div>
+
+            <form id="debtor-form">
+              <div class="field-group">
+                <label data-i18n="fullName">F.I.Sh</label>
+                <input type="text" id="name" data-i18n-placeholder="namePlaceholder" placeholder="Ism kiriting" required />
+              </div>
+
+              <div class="field-group">
+                <label data-i18n="phone">Telefon</label>
+                <input type="tel" id="phone" data-i18n-placeholder="phonePlaceholder" placeholder="+998 90 123 45 67" required />
+              </div>
+
+              <div class="field-group">
+                <label data-i18n="debtAmount">Qarz miqdori</label>
+                <input type="number" id="amount" data-i18n-placeholder="amountPlaceholder" placeholder="500000" required />
+              </div>
+
+              <div class="field-group">
+                <label data-i18n="status">Status</label>
+                <select id="status">
+                  <option value="faol" data-i18n="statusActive">Faol</option>
+                  <option value="wait" data-i18n="statusWait">Kutilmoqda</option>
+                  <option value="late" data-i18n="statusLate">Muddat o'tgan</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label data-i18n="lastPayment">Oxirgi to'lov</label>
+                <input type="date" id="last-payment" />
+              </div>
+
+              <button type="submit" class="submit-btn" data-i18n="save">Saqlash</button>
+            </form>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="history">
+          <div class="history-card">
+            <div class="panel-header compact-header">
+              <div>
+                <p class="label" data-i18n="journal">Jurnal</p>
+                <h2 data-i18n="historyTitle">Tarix</h2>
+              </div>
+            </div>
+
+            <div class="history-list">
+              <div class="history-item">
+                <span class="dot success"></span>
+                <div>
+                  <strong data-i18n="paymentReceived">To'lov qabul qilindi</strong>
+                  <small>Abdulla Karimov • 320 000 so'm</small>
+                </div>
+                <time>12.09.2026</time>
+              </div>
+
+              <div class="history-item">
+                <span class="dot warning"></span>
+                <div>
+                  <strong data-i18n="reminderSent">Eslatma yuborildi</strong>
+                  <small>Malika Saidova • 185 000 so'm</small>
+                </div>
+                <time>09.09.2026</time>
+              </div>
+
+              <div class="history-item">
+                <span class="dot danger"></span>
+                <div>
+                  <strong data-i18n="overdueMarked">Muddat o‘tgan</strong>
+                  <small>Jasur Toshmatov • 410 000 so'm</small>
+                </div>
+                <time>05.09.2026</time>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="profile">
+          <div class="profile-card">
+            <div class="avatar">U</div>
+            <div class="profile-meta">
+              <p class="label" data-i18n="account">Akkaunt</p>
+              <h1>Umarbek Makhmudov</h1>
+              <p class="email">umarbek@gmail.com</p>
+            </div>
+            <button class="outline-btn" data-i18n="edit">Tahrirlash</button>
+          </div>
+
+          <section class="settings-group">
+            <h3 data-i18n="general">Umumiy</h3>
+
+            <div class="setting-row sms-row">
+              <span data-i18n="smsPackage">SMS paketi</span>
+              <strong id="smsPackageSummary">50 SMS • 12 сомон • 60 кун</strong>
+            </div>
+
+            <div class="sms-offers">
+              <div class="sms-offer active" data-package="50sms" data-price="12" data-days="60">
+                <div class="offer-top">
+                  <strong>50 SMS</strong>
+                  <span>12 сомон</span>
+                </div>
+                <small>60 кун муҳлат</small>
+                <button class="buy-package-btn" type="button">Сотиб олиш</button>
+              </div>
+            </div>
+
+            <div class="payment-modal hidden" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+              <div class="payment-dialog">
+                <button class="modal-close" id="closePayment" type="button" aria-label="Закрыть">×</button>
+                <p class="label" data-i18n="paymentStep">Пардохт</p>
+                <h2 id="paymentTitle" data-i18n="buySmsTitle">50 SMS харид кунед</h2>
+                <p class="payment-note" data-i18n="paymentInstruction">Пулро ба корти Душанбе Сити гузаронед ва расиди пардохтро фиристед.</p>
+
+                <div class="card-payment-box">
+                  <span data-i18n="dushanbeCityCard">Корти Душанбе Сити</span>
+                  <strong id="cityCardNumber">4713 3800 1620 8346</strong>
+                  <small data-i18n="cardPlaceholder">Рақами корти худро дар index.html иваз кунед</small>
+                </div>
+
+                <form id="directPaymentForm">
+                  <div class="field-group">
+                    <label for="payerPhone" data-i18n="payerPhone">Рақами телефони шумо</label>
+                    <input id="payerPhone" type="tel" placeholder="+992 90 000 00 00" required />
+                  </div>
+
+                  <div class="field-group">
+                    <label for="payerCard" data-i18n="payerCard">Рақами корти шумо</label>
+                    <input id="payerCard" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" required />
+                  </div>
+
+                  <button class="submit-btn payment-submit" type="submit" data-i18n="payNow">Ҳозир пардохт кардан</button>
+                </form>
+                <p class="payment-status" id="paymentStatus" role="status"></p>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <span data-i18n="identification">Identifikatsiya</span>
+              <strong class="verification-status" id="verificationStatus" data-i18n="notVerified">Тасдиқ нашудааст</strong>
+            </div>
+
+            <div class="verification-box">
+              <label data-i18n="passportData">Маълумоти шиноснома</label>
+              <div class="identity-fields">
+                <input id="firstName" type="text" data-i18n-placeholder="firstName" placeholder="Ном" />
+                <input id="lastName" type="text" data-i18n-placeholder="lastName" placeholder="Насаб" />
+                <input id="fatherName" type="text" data-i18n-placeholder="fatherName" placeholder="Номи падар" />
+                <input id="birthDate" type="date" aria-label="Таърихи таваллуд" />
+              </div>
+              <div class="verification-controls single-control">
+                <button id="verifyIdentity" class="verify-btn" type="button" data-i18n="verify">Тасдиқ кардан</button>
+              </div>
+              <small data-i18n="identityHint">Ҳама маълумотро пур кунед</small>
+              <div class="verified-client hidden" id="verifiedClient">
+                <span data-i18n="clientName">Номи мизоҷ</span>
+                <strong id="verifiedClientName">Umarbek Makhmudov</strong>
+                <small id="verifiedClientBirthDate"></small>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3 data-i18n="settings">Sozlamalar</h3>
+
+            <div class="setting-row">
+              <span data-i18n="shop">Do'kon</span>
+              <strong data-i18n="enabled">Yoqilgan</strong>
+            </div>
+
+            <div class="setting-row">
+              <span data-i18n="security">Xavfsizlik</span>
+              <strong>2FA</strong>
+            </div>
+
+            <div class="setting-row language-row">
+              <span data-i18n="language">Забон</span>
+              <div class="language-list">
+                <button class="lang active" data-lang="tg">Тоҷикӣ</button>
+                <button class="lang" data-lang="ru">Русский</button>
+                <button class="lang" data-lang="uz">O'zbekcha</button>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <span data-i18n="theme">Ko'rinish</span>
+              <strong data-i18n="light">Yorqin</strong>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3 data-i18n="help">Yordam</h3>
+
+            <div class="setting-row">
+              <span data-i18n="rateApp">Ilovani baholang</span>
+              <strong>★★★★★</strong>
+            </div>
+
+            <div class="setting-row link-row">
+              <span data-i18n="faq">Tez-tez beriladigan savollar</span>
+              <strong>›</strong>
+            </div>
+
+            <div class="setting-row link-row">
+              <span data-i18n="terms">Foydalanish shartlari</span>
+              <strong>›</strong>
+            </div>
+          </section>
+
+          <section class="settings-group social-group">
+            <h3 data-i18n="socials">Ijtimoiy tarmoqlar</h3>
+            <div class="social-list">
+              <button class="social-btn instagram">Instagram</button>
+              <button class="social-btn telegram">Telegram</button>
+              <button class="social-btn whatsapp">WhatsApp</button>
+            </div>
+          </section>
+
+          <section class="settings-group qr-group">
+            <div class="qr-copy">
+              <p class="label" data-i18n="shareApp">Иловани бўлишиш</p>
+              <h3 data-i18n="scanQr">QR-кодни бошқа телефонда скан қилинг</h3>
+              <p class="qr-note" id="qrNote" data-i18n="qrLocalNote">Веб-сайт манзили берилганда QR орқали очилади.</p>
+            </div>
+            <img id="appQrCode" class="app-qr" alt="QARZ ManaGER QR-kod" width="180" height="180" />
+          </section>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="Asosiy navigatsiya">
+        <button class="nav-btn active" data-target="home">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z"/><path d="M9 21v-6h6v6"/></svg>
+          </span>
+          <small data-i18n="navHome">Главни</small>
+        </button>
+        <button class="nav-btn" data-target="add">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+          </span>
+          <small data-i18n="navAdd">Кошилок</small>
+        </button>
+        <button class="nav-btn" data-target="history">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M3 12a9 9 0 0 0 2.5 6.4"/></svg>
+          </span>
+          <small data-i18n="navHistory">История</small>
+        </button>
+        <button class="nav-btn" data-target="profile">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+          </span>
+          <small data-i18n="navProfile">Профил</small>
+        </button>
+      </nav>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
